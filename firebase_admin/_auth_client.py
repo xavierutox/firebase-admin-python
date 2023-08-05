@@ -750,8 +750,11 @@ class Client:
         """
         return self._provider_manager.list_saml_provider_configs(page_token, max_results)
 
-    def _check_jwt_revoked_or_disabled(self, verified_claims, exc_type, label):
-        user = self.get_user(verified_claims.get('uid'))
+    def _check_jwt_revoked_or_disabled(self, verified_claims, exc_type, label, tenant_id=None):
+        if not tenant_id:
+            user = self.get_user(verified_claims.get('uid'))
+        else:
+            user = firebase_admin.tenant_mgt.auth_for_tenant(tenant_id).get_user(verified_claims.get('uid'))
         if user.disabled:
             raise _auth_utils.UserDisabledError('The user record is disabled.')
         if verified_claims.get('iat') * 1000 < user.tokens_valid_after_timestamp:

@@ -243,7 +243,7 @@ def create_session_cookie(id_token, expires_in, app=None):
     return client._token_generator.create_session_cookie(id_token, expires_in)
 
 
-def verify_session_cookie(session_cookie, check_revoked=False, app=None):
+def verify_session_cookie(session_cookie, check_revoked=False, app=None, tenant_id=None):
     """Verifies a Firebase session cookie.
 
     Accepts a session cookie string, verifies that it is current, and issued
@@ -273,7 +273,7 @@ def verify_session_cookie(session_cookie, check_revoked=False, app=None):
     verified_claims = client._token_verifier.verify_session_cookie(session_cookie)
     if check_revoked:
         client._check_jwt_revoked_or_disabled(
-            verified_claims, RevokedSessionCookieError, 'session cookie')
+            verified_claims, RevokedSessionCookieError, 'session cookie', tenant_id)
     return verified_claims
 
 
